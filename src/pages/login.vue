@@ -11,7 +11,7 @@
                     <altcha-widget
                         type="checkbox"
                         language="zh-cn"
-                        :challengeurl="challengeUrl"
+                        :challenge="challengeUrl"
                         class="captcha"
                         @statechange="onStateChange"
                     />
