@@ -49,7 +49,7 @@ jobs:
             API_URL="${{ vars.VITE_API_URL }}"
           fi
           if [ -z "$API_URL" ]; then
-            API_URL="https://example.com"
+            API_URL="https://bot.vuphub.fun"
           fi
 
           APP_NAME="${{ vars.VITE_APP_NAME }}"
