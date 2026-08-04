@@ -3,6 +3,9 @@
   <div class="app" v-show="isLoaded">
     <router-view></router-view>
   </div>
+  <footer class="shop-beian">
+    <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备2026006931号</a>
+  </footer>
   <div class="van-safe-area-bottom"></div>
 </template>
 <script setup>
@@ -47,4 +50,25 @@ onMounted(async () => {
   }
 });
 </script>
-<style scoped></style>
+<style scoped>
+.shop-beian {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px calc(2px + env(safe-area-inset-bottom));
+  background: rgba(250, 250, 250, 0.96);
+}
+
+.shop-beian a {
+  font-size: 12px;
+  line-height: 20px;
+  color: #999;
+  text-decoration: none;
+}
+</style>

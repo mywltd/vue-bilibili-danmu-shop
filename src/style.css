@@ -18,4 +18,10 @@
 body {
   min-height: 100vh;
   background-color: #fafafa;
+  /* 给底部备案条留空，避免被 TabBar 挡住 */
+  padding-bottom: calc(24px + env(safe-area-inset-bottom));
+}
+
+.van-tabbar--fixed {
+  bottom: calc(24px + env(safe-area-inset-bottom)) !important;
 }
