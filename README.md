@@ -59,6 +59,20 @@ npm run build
 
 构建完成后，静态文件将生成于 `dist/`​ 目录中，可部署至任意静态资源服务器（如 Nginx、Vercel 等）。
 
+### 下载预构建包
+
+- **Actions 产物**：仓库 Actions → 选择成功的 `Build Dist` → Artifacts 下载 `vue-bilibili-danmu-shop-dist*.zip`（保留 30 天）
+- **Release 产物**：打 `v*` 标签后，在 Releases 页面下载同名 zip（长期可下）
+
+手动触发：Actions → Build Dist → Run workflow，可填写后端 API 地址。
+
+也可在仓库 Variables 配置默认值：
+
+| Variable | 说明 |
+|----------|------|
+| `VITE_API_URL` | 后端 API 地址 |
+| `VITE_APP_NAME` | 商城名称 |
+
 ---
 
 ## 🧩 配套项目

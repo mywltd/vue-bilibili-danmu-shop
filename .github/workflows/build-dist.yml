@@ -1,0 +1,111 @@
+name: Build Dist
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+    paths:
+      - 'src/**'
+      - 'public/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'vite.config.js'
+      - 'index.html'
+      - '.env.example'
+      - '.github/workflows/build-dist.yml'
+  workflow_dispatch:
+    inputs:
+      api_url:
+        description: '后端 API 地址（写入 VITE_API_URL）'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-dist-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Resolve build env
+        id: env
+        shell: bash
+        run: |
+          API_URL="${{ github.event.inputs.api_url }}"
+          if [ -z "$API_URL" ]; then
+            API_URL="${{ vars.VITE_API_URL }}"
+          fi
+          if [ -z "$API_URL" ]; then
+            API_URL="https://example.com"
+          fi
+
+          APP_NAME="${{ vars.VITE_APP_NAME }}"
+          if [ -z "$APP_NAME" ]; then
+            APP_NAME="哔哩哔哩积分商城"
+          fi
+
+          {
+            echo "api_url=$API_URL"
+            echo "app_name=$APP_NAME"
+          } >> "$GITHUB_OUTPUT"
+          echo "Using VITE_API_URL=$API_URL"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        env:
+          VITE_APP_NAME: ${{ steps.env.outputs.app_name }}
+          VITE_API_URL: ${{ steps.env.outputs.api_url }}
+        run: npm run build
+
+      - name: Pack dist
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME}"
+          SHORT_SHA="${GITHUB_SHA::7}"
+          NAME="vue-bilibili-danmu-shop-dist"
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            ARCHIVE="${NAME}-${VERSION}.zip"
+          else
+            ARCHIVE="${NAME}-${SHORT_SHA}.zip"
+          fi
+          (
+            cd dist
+            zip -r "../${ARCHIVE}" .
+          )
+          cp "$ARCHIVE" "${NAME}-latest.zip"
+          echo "ARCHIVE=$ARCHIVE" >> "$GITHUB_ENV"
+          ls -lh ./*.zip
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vue-bilibili-danmu-shop-dist
+          path: |
+            vue-bilibili-danmu-shop-dist-*.zip
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload release assets
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            vue-bilibili-danmu-shop-dist-*.zip
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
