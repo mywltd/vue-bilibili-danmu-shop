@@ -4,9 +4,18 @@
             <van-cell-group inset class="login" v-show="visible.login">
                 <div class="title">我来啦</div>
                 <div class="remark">uid可以从「我的」「设置」「个人资料」中查看</div>
-                <div class="remark">积分增加可能会有延迟，不要慌喔</div>
+                <div class="remark">需先在直播间互动登记后才能登录</div>
                 <input type="number" placeholder="请输入UID" class="input" v-model="uid">
                 <div class="van-hairline--bottom"></div>
+                <div v-if="isCaptcha" class="captcha-wrap">
+                    <altcha-widget
+                        type="checkbox"
+                        language="zh-cn"
+                        :challengeurl="challengeUrl"
+                        class="captcha"
+                        @statechange="onStateChange"
+                    />
+                </div>
                 <van-button color="linear-gradient(to right, var(--theme-color-1), var(--theme-color-2))" size="small"
                     class="submit" block round @click="getUserVip" :loading="loading" loading-text="查询中...">
                     登录
@@ -28,14 +37,14 @@
         </transition>
         <transition name="van-slide-down">
             <van-cell-group inset class="login" v-show="visible.register">
-                <div class="title">注册耶</div>
-                <div class="remark">你是第一次登录的新用户</div>
-                <div class="remark">可以给自己设置一个初始密码，不要忘记喔</div>
+                <div class="title">设置密码</div>
+                <div class="remark">你的账号已登记，但还没有设置密码</div>
+                <div class="remark">设置一个初始密码，不要忘记喔</div>
                 <input type="text" placeholder="请输入密码" class="input" v-model="password">
                 <div class="van-hairline--bottom"></div>
                 <van-button color="linear-gradient(to right, var(--theme-color-1), var(--theme-color-2))" size="small"
                     class="submit" block round @click="performLogin" :loading="loading" loading-text="查询中...">
-                    注册
+                    确认
                 </van-button>
             </van-cell-group>
         </transition>
@@ -49,6 +58,8 @@ import { ref, onMounted } from 'vue';
 import cookie from 'js-cookie';
 import { showToast } from 'vant';
 import { useRouter } from 'vue-router';
+import 'altcha';
+import 'altcha/i18n/zh-cn';
 
 const router = useRouter();
 
@@ -62,6 +73,9 @@ const loading = ref(false);
 const uid = ref('');
 const password = ref('');
 const passwordShow = ref(true);
+const isCaptcha = ref(false);
+const captcha = ref('');
+const challengeUrl = `${config.baseUrl}/api/altcha/challenge`;
 
 // 切换页面的显示状态
 const switchPages = (type) => {
@@ -76,10 +90,20 @@ const setLoading = (isLoading) => {
     loading.value = isLoading;
 };
 
+const onStateChange = (ev) => {
+    if (ev.detail?.state === 'verified') {
+        captcha.value = ev.detail.payload || '';
+    }
+};
+
 // 获取用户 VIP 信息
 const getUserVip = async () => {
     if (!uid.value) {
         showToast('请输入有效uid');
+        return;
+    }
+    if (isCaptcha.value && !captcha.value) {
+        showToast('请先完成验证');
         return;
     }
     setLoading(true);
@@ -87,7 +111,7 @@ const getUserVip = async () => {
         const res = await httpRequest({
             url: config.interface.getUserVip,
             method: 'post',
-            data: { uid: uid.value },
+            data: { uid: uid.value, captcha: captcha.value },
         });
         setLoading(false);
         if (res.code === 0) {
@@ -116,12 +140,16 @@ const performLogin = async () => {
         showToast('请输入密码');
         return;
     }
+    if (isCaptcha.value && !captcha.value) {
+        showToast('请先完成验证');
+        return;
+    }
     setLoading(true);
     try {
         const res = await httpRequest({
             url: config.interface.performLogin,
             method: 'post',
-            data: { uid: uid.value, password: password.value },
+            data: { uid: uid.value, password: password.value, captcha: captcha.value },
         });
         setLoading(false);
         if (res.code == 0) {
@@ -148,6 +176,7 @@ const getConfigData = async () => {
             const box = document.querySelector('.login-container');
             box.style.backgroundImage = "url('" + res.data.background + "')"; // 设置背景图片
             passwordShow.value = res.data.password
+            isCaptcha.value = !!res.data.isCaptcha
         } else {
             showToast(res.message || '获取失败');
         }
@@ -230,6 +259,16 @@ onMounted(() => {
 .input:focus {
     border-color: var(--theme-color-1);
     /* 聚焦时的边框颜色 */
+}
+
+.captcha-wrap {
+    margin-top: 0.75rem;
+    display: flex;
+    justify-content: center;
+}
+
+.captcha {
+    width: 100%;
 }
 
 .submit {

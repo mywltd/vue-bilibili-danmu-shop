@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@vant/area-data": "^2.0.0",
+    "altcha": "^3.2.1",
     "axios": "^1.7.9",
     "bowser": "^2.11.0",
     "crypto-js": "^4.2.0",
