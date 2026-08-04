@@ -53,22 +53,28 @@ onMounted(async () => {
 <style scoped>
 .shop-beian {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 200;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 24px;
-  padding: 2px 8px calc(2px + env(safe-area-inset-bottom));
-  background: rgba(250, 250, 250, 0.96);
+  left: 50%;
+  bottom: calc(52px + env(safe-area-inset-bottom, 0px));
+  z-index: 90;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 90%;
+  margin: 0;
+  padding: 0;
+  background: none;
+  pointer-events: none;
 }
 
 .shop-beian a {
-  font-size: 12px;
-  line-height: 20px;
-  color: #999;
+  pointer-events: auto;
+  font-size: 11px;
+  line-height: 1.4;
+  color: rgba(0, 0, 0, 0.35);
   text-decoration: none;
+  text-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
+}
+
+.shop-beian a:active {
+  color: rgba(0, 0, 0, 0.55);
 }
 </style>

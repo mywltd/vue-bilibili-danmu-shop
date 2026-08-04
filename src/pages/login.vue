@@ -198,9 +198,11 @@ onMounted(() => {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    min-height: 100vh;
+    width: 100%;
     margin: 0;
+    overflow: hidden;
     background-size: cover;
     /* 保证背景图自适应并填充整个背景 */
     background-position: center;

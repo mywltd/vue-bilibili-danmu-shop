@@ -13,15 +13,17 @@
   margin: 0;
   padding: 0;
   font-size: 16px;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: #fafafa;
 }
 
 body {
   min-height: 100vh;
-  background-color: #fafafa;
-  /* 给底部备案条留空，避免被 TabBar 挡住 */
-  padding-bottom: calc(24px + env(safe-area-inset-bottom));
-}
-
-.van-tabbar--fixed {
-  bottom: calc(24px + env(safe-area-inset-bottom)) !important;
 }
