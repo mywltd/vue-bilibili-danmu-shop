@@ -49,6 +49,9 @@
             </van-cell-group>
         </transition>
     </div>
+    <footer class="login-beian">
+        <a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">京ICP备2026006931号</a>
+    </footer>
 </template>
 
 <script setup>
@@ -294,5 +297,28 @@ onMounted(() => {
     /* 保证 van-button 的样式与自定义样式的兼容性 */
     font-size: 1rem;
     height: 40px;
+}
+
+.login-beian {
+    position: fixed;
+    left: 50%;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 3;
+    transform: translateX(-50%);
+    width: max-content;
+    max-width: 90%;
+    margin: 0;
+    padding: 0;
+    background: none;
+    pointer-events: none;
+}
+
+.login-beian a {
+    pointer-events: auto;
+    font-size: 11px;
+    line-height: 1.4;
+    color: rgba(0, 0, 0, 0.35);
+    text-decoration: none;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.85);
 }
 </style>
